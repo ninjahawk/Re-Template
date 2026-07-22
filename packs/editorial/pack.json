@@ -1,0 +1,46 @@
+{
+  "id": "editorial",
+  "name": "Editorial",
+  "basedOn": "an inspired-by preset (public design conventions)",
+  "license": "CC0-1.0",
+  "kind": "inspired-by",
+  "attribution": "Original token choices — evokes a restrained, high-contrast editorial convention. Not a copy of any proprietary system.",
+  "tokens": {
+    "font": {
+      "sans": "'Georgia', 'Iowan Old Style', 'Times New Roman', serif",
+      "mono": "ui-monospace, 'SF Mono', Menlo, monospace",
+      "scale": [14, 16, 19, 24, 32, 44, 60],
+      "weight": { "normal": 400, "medium": 500, "bold": 700 },
+      "lineHeight": { "tight": 1.15, "normal": 1.6 }
+    },
+    "color": {
+      "roles": {
+        "canvas": "#fbfaf7",
+        "canvasSubtle": "#f2efe8",
+        "fg": "#1a1a1a",
+        "muted": "#5c574e",
+        "accent": "#8a1c1c",
+        "accentFg": "#fbfaf7",
+        "success": "#2f6b3a",
+        "danger": "#8a1c1c",
+        "border": "#ddd8cd"
+      }
+    },
+    "space": [4, 8, 12, 20, 32, 48, 72, 96],
+    "radius": { "sm": 2, "md": 3, "lg": 4, "full": 9999 },
+    "shadow": {
+      "sm": "0 1px 0 rgba(26,26,26,0.06)",
+      "md": "0 2px 4px rgba(26,26,26,0.08)",
+      "lg": "0 6px 16px rgba(26,26,26,0.1)"
+    },
+    "motion": { "fast": "120ms", "normal": "220ms", "easing": "cubic-bezier(0.4, 0, 0.2, 1)" }
+  },
+  "rules": {
+    "killGradientText": true,
+    "killGlowOnDark": true,
+    "maxAccentHues": 1,
+    "preferSystemFont": false,
+    "flattenOverRoundedCorners": true,
+    "demoteEmojiHeadings": true
+  }
+}

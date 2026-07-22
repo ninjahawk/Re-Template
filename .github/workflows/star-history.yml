@@ -1,0 +1,29 @@
+name: star-history
+
+# Regenerates the star-history charts embedded in the README once a day.
+# The committed SVGs are placeholders until the first stars land.
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate charts
+        run: node tools/star-history.js
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- media/star-history.svg media/star-history-dark.svg; then
+            git add media/star-history.svg media/star-history-dark.svg
+            git commit -m "chore: refresh star-history charts"
+            git push
+          fi
