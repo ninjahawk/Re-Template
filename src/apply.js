@@ -12,33 +12,52 @@ import { SLOP_HEXES } from './slop.js';
 
 const GRADIENT_WORDS = /(indigo|violet|purple|fuchsia|blurple)/i;
 
+// Emit the --rt-* custom properties for one set of color roles.
+function roleVars(c) {
+  return [
+    `--rt-canvas:${c.canvas};`,
+    `--rt-canvas-subtle:${c.canvasSubtle || c.canvas};`,
+    `--rt-fg:${c.fg};`,
+    `--rt-muted:${c.muted || c.fg};`,
+    `--rt-accent:${c.accent};`,
+    `--rt-accent-fg:${c.accentFg || '#fff'};`,
+    `--rt-border:${c.border || '#d1d9e0'};`,
+    `--rt-up:${c.success || c.accent};`,
+    `--rt-down:${c.danger || c.accent};`,
+  ].join('');
+}
+
 // Build the CSS custom properties for a pack, plus a normalizing base layer.
 // Every transform below points at these variables, so a page reskinned to any
-// pack resolves through one consistent set of tokens.
+// pack resolves through one consistent set of tokens. When the pack ships a dark
+// role set (`color.rolesDark`), the layer becomes theme-aware exactly the way a
+// real design system does it: follow the OS by default, and honor an explicit
+// `data-theme` on :root as an override.
 function packStylesheet(pack) {
   const c = pack.tokens.color.roles;
+  const dark = pack.tokens.color.rolesDark;
   const radius = pack.tokens.radius?.md ?? 8;
   const shadow = pack.tokens.shadow?.md ?? '0 3px 6px rgba(31,35,40,.15)';
   const sans = pack.tokens.font.sans;
+  const mono = pack.tokens.font.mono || 'ui-monospace, SFMono-Regular, Menlo, monospace';
   const scale = pack.tokens.font.scale || [14, 16, 20, 24, 32, 40];
+
+  let theming = '';
+  if (dark) {
+    theming = `
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){${roleVars(dark)}}}
+:root[data-theme="dark"]{${roleVars(dark)}}
+:root[data-theme="light"]{${roleVars(c)}}`;
+  }
+
   return `
-/* re-template · reskinned to "${pack.name}" (${pack.basedOn}) */
-:root{
-  --rt-canvas:${c.canvas};
-  --rt-canvas-subtle:${c.canvasSubtle || c.canvas};
-  --rt-fg:${c.fg};
-  --rt-muted:${c.muted || c.fg};
-  --rt-accent:${c.accent};
-  --rt-accent-fg:${c.accentFg || '#fff'};
-  --rt-border:${c.border || '#d1d9e0'};
-  --rt-sans:${sans};
-  --rt-radius:${radius}px;
-  --rt-shadow:${shadow};
-}
-body{font-family:var(--rt-sans);color:var(--rt-fg);background:var(--rt-canvas);-webkit-font-smoothing:antialiased;}
-h1,h2,h3,h4{font-family:var(--rt-sans);color:var(--rt-fg);letter-spacing:-0.01em;line-height:1.25;}
-h1{font-size:${(scale[scale.length - 1] || 40) / 16}rem;font-weight:600;}
+/* re-template · reskinned to "${pack.name}" (${pack.basedOn})${dark ? ' · light + dark' : ''} */
+:root{${roleVars(c)}--rt-sans:${sans};--rt-mono:${mono};--rt-radius:${radius}px;--rt-shadow:${shadow};}${theming}
+body{font-family:var(--rt-sans);color:var(--rt-fg);background:var(--rt-canvas);-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+h1,h2,h3,h4{font-family:var(--rt-sans);color:var(--rt-fg);letter-spacing:-0.01em;line-height:1.2;}
+h1{font-size:${(scale[scale.length - 1] || 40) / 16}rem;font-weight:500;}
 a{color:var(--rt-accent);}
+code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
 .rt-btn,button,.btn{border-radius:var(--rt-radius);}
 `.trim();
 }
