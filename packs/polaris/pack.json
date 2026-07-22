@@ -1,0 +1,46 @@
+{
+  "id": "polaris",
+  "name": "Polaris-style",
+  "basedOn": "Shopify Polaris",
+  "license": "MIT",
+  "kind": "open-source",
+  "attribution": "https://polaris.shopify.com",
+  "tokens": {
+    "font": {
+      "sans": "-apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace",
+      "scale": [12, 13, 14, 16, 20, 24, 32],
+      "weight": { "normal": 400, "medium": 500, "semibold": 650 },
+      "lineHeight": { "tight": 1.25, "normal": 1.5 }
+    },
+    "color": {
+      "roles": {
+        "canvas": "#ffffff",
+        "canvasSubtle": "#f6f6f7",
+        "fg": "#202223",
+        "muted": "#616161",
+        "accent": "#008060",
+        "accentFg": "#ffffff",
+        "success": "#008060",
+        "danger": "#d72c0d",
+        "border": "#e1e3e5"
+      }
+    },
+    "space": [4, 8, 12, 16, 20, 24, 32, 48],
+    "radius": { "sm": 6, "md": 8, "lg": 12, "full": 9999 },
+    "shadow": {
+      "sm": "0 1px 0 rgba(0,0,0,0.05)",
+      "md": "0 2px 4px rgba(31,33,36,0.1)",
+      "lg": "0 4px 12px rgba(31,33,36,0.14)"
+    },
+    "motion": { "fast": "100ms", "normal": "150ms", "easing": "cubic-bezier(0.25, 0.1, 0.25, 1)" }
+  },
+  "rules": {
+    "killGradientText": true,
+    "killGlowOnDark": true,
+    "maxAccentHues": 1,
+    "preferSystemFont": true,
+    "flattenOverRoundedCorners": true,
+    "demoteEmojiHeadings": true
+  }
+}

@@ -1,89 +1,233 @@
+<div align="center">
+
 # Re-Template
 
-**Your AI-built site looks like every other AI-built site. Re-Template makes it look like a real company shipped it.**
+*Reskin AI-slop websites to a real design language —<br>detect the vibe-coded look, then replace it, don't just strip it.*
 
-Every vibe-coded landing page arrives wearing the same uniform: an indigo→purple gradient hero, Inter, three feature cards with rounded icons, a `Get Started` button that links to nothing. Detectors will happily tell you your site scores 87/100 on slop. Great. Now what?
+![Re-Template demo](media/demo.gif)
 
-Re-Template is the part nobody built yet: it doesn't just *detect* the AI look and it doesn't just *strip* it back to bland. It **reskins your site to a real, opinionated design language** — so it reads like Material, Primer, or Polaris built it, not a language model averaging its training data.
+[![Node](https://img.shields.io/badge/Node-18+-3C873A?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Runtime deps](https://img.shields.io/badge/runtime_deps-0-3fb950)](package.json)
+[![Brand packs](https://img.shields.io/badge/brand_packs-5-58a6ff)](packs/)
+[![Tests](https://img.shields.io/badge/tests-18_passing-3fb950)](test/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-```bash
-# score the slop
-npx re-template score ./site
+**[▶ Watch the demo](media/demo.webm)** · **[📊 The research](docs/RESEARCH.md)** · **[🎨 Brand packs](packs/)** · **[🧩 Contribute a pack](CONTRIBUTING.md)**
 
-# reskin it
-npx re-template apply --pack primer ./site
-
-# see the receipts
-npx re-template diff ./site   # before / after, side by side
-```
-
-> [!NOTE]
-> Re-Template is early and moves fast. Star it, break it, and send brand packs.
+</div>
 
 ---
 
-## Why this exists
+## Getting started & staying tuned with us.
 
-AI coding tools don't have taste — they have an **average**. Feed a model "build me a landing page" and it returns the median of every Tailwind starter in its training data: `bg-indigo-500`, `from-indigo-500 to-purple-600`, Inter, hero → 3 cards → testimonials → pricing → footer. It's become as instantly datable as a 2015 WordPress theme.
+Star us, and you will receive all release notifications from GitHub without any delay!
 
-The market's answer so far has been **subtractive**:
+<a href="https://github.com/ninjahawk/Re-Template/stargazers">
+ <picture>
+   <!-- Chart is regenerated daily by .github/workflows/star-history.yml -->
+   <source media="(prefers-color-scheme: dark)" srcset="media/star-history-dark.svg" />
+   <source media="(prefers-color-scheme: light)" srcset="media/star-history.svg" />
+   <img alt="Star History Chart" src="media/star-history.svg" />
+ </picture>
+</a>
 
-- **Detectors** score your slop and leave. (pols.dev, Go Digital Apps)
-- **Strippers** remove the tells and leave you with blander slop. (kill-ai-slop)
-- **Preventers** stop the agent making slop in the first place. (Taste Skill)
-- **Extractors** pull raw design tokens out of a site and wish you luck. (Dembrandt, Specify)
+---
 
-Nobody does the **additive** move: *pick a real design language and make my site actually look like that.* That's Re-Template.
+## Overview
 
-## How it works
+AI coding tools don't have taste — they have an *average*. Ask one for a landing
+page and it returns the median of every Tailwind starter in its training data:
+an indigo→purple gradient hero, Inter, a gradient-clipped headline, three feature
+cards with emoji icons, a `Get Started` button that links to nothing. The look
+has become as instantly datable as a 2015 WordPress theme, and it has a name:
+*AI slop*, or *vibe-coded* design.
 
-1. **Detect** — parse the rendered DOM + computed styles and fingerprint the slop signature (default fonts, indigo/purple gradients, canned layout rhythm, glow-on-dark, emoji headings). You get an itemized report and a 0–100 score.
-2. **Map** — translate your existing elements onto a target **brand pack**: a structured set of design tokens (type scale, color roles, spacing, radii, shadows, motion, layout rules).
-3. **Apply** — rewrite the CSS/tokens so the site inherits the target's *system*, not its logo. Output as a diff, a new stylesheet, or a PR.
-4. **Prove** — before/after render so you can see (and post) the transformation.
+The tools that exist for this are **subtractive**. Detectors score your page and
+leave. Strippers remove the tells and hand you something blander. Extractors pull
+raw tokens out of a real site and wish you luck. None of them make your page
+actually look like anything.
+
+Re-Template is **additive**. It fingerprints the slop signature, then rewrites
+the *system-level* choices — color, type, gradients, radius, elevation — so the
+page inherits a real, opinionated design language (GitHub Primer, Google
+Material, Shopify Polaris, IBM Carbon…) instead of the model's defaults. It
+replaces the look; it does not just delete it. Detection and the reskin share one
+source of truth, so every point of the score maps to a specific rewrite: *you
+lost 24 points to indigo gradients — here are the three it replaced.*
+
+Re-Template runs as a **zero-dependency CLI** (and, soon, an agent skill), works
+on any HTML/CSS with no build step, and ships **brand packs** — one-file token
+sets that anyone can contribute. It applies design *systems*, never a company's
+*identity*: no logos, no wordmarks, nothing meant to pass your site off as
+someone else's (see [Legal & scope](#legal--scope)).
+
+## What a reskin does that a detector doesn't
+
+The value is in the gap between *knowing* a page is slop and *fixing* it. Three
+moments from the demo run on a stock vibe-coded landing page:
+
+**1. The slop is measurable, and itemized.** The page scores **84/100**. Every
+tell is named and priced — the indigo gradients, the clipped headline, Inter, the
+emoji, the glow shadows — so the number is an explanation, not a verdict.
+
+![The slop, scored and itemized](media/still_slop.png)
+
+**2. The fix is a real transform, not a delete key.** `apply --pack primer`
+streams an explainable ledger: gradient headline → solid foreground, indigo hex →
+accent color, Inter → the pack's type family, over-rounded corners → the pack's
+radius, emoji removed from headings. Each line is a rewrite that actually ran.
+
+![The reskin, as an explainable ledger](media/still_apply.png)
+
+**3. The result is a system, not a blank.** The same page, now inheriting
+Primer's type scale, color roles, spacing and elevation — **slop 9/100**. It
+doesn't look *stripped*; it looks like a team with a design system shipped it.
+
+![The result: a real design language, not a blank](media/still_clean.png)
+
+## Reading the report
+
+- **The score is 0–100 and additive.** Each tell contributes weighted points up
+  to a per-tell cap, summed and clamped, so no single tell can max the score
+  alone — heavy slop takes a *spread* of tells. `clean < 15 ≤ light < 40 ≤
+  moderate < 70 ≤ heavy`.
+- **Every finding is a named rule** with a per-hit weight, the number of hits,
+  and the points charged. The rule set is one file — [`src/slop.js`](src/slop.js)
+  — shared verbatim by the detector and the transformer.
+- **`apply` prints the inverse:** the exact rewrites it performed and the
+  before→after score, then writes the reskinned HTML (or edits in place with
+  `-w`).
+- **`diff`** shows what *would* change without writing anything.
+
+```text
+$ re-template score examples/slop/index.html
+
+  Slop score  84 / 100   █████████████████░░░  (heavy)
+
+  Tells found:
+  ● indigo→purple gradient background          ×3   +24
+  ● gradient-clipped headline text             ×2   +14
+  ● raw indigo/violet hex colors               ×7   +12
+  ● Inter / default system font, no type choice     +10
+  ● over-rounded corners everywhere            ×4   +9
+  ● emoji in headings                               +6
+  ● pill "eyebrow" badge with leading dot      ×2   +6
+  ● generic "Get Started" CTA                       +3
+```
 
 ## Brand packs
 
-A brand pack is just tokens + rules. Launch packs are built on **genuinely open-source design systems** — so this is legally clean and you get a real, documented system to map onto:
+A pack is a JSON file of design tokens plus a few rules. Launch packs are built on
+**genuinely open-source design systems**, so the mapping targets a real,
+documented system and the licensing is clean.
 
-| Pack | Based on | License |
-|------|----------|---------|
-| `material` | Google Material | Apache-2.0 |
-| `primer` | GitHub Primer | MIT |
-| `polaris` | Shopify Polaris | MIT |
-| `carbon` | IBM Carbon | Apache-2.0 |
-| `fluent` | Microsoft Fluent | MIT |
+| Pack | Based on | License | Kind |
+|------|----------|---------|------|
+| `primer` | GitHub Primer | MIT | open-source |
+| `material` | Google Material | Apache-2.0 | open-source |
+| `polaris` | Shopify Polaris | MIT | open-source |
+| `carbon` | IBM Carbon | Apache-2.0 | open-source |
+| `editorial` | inspired-by preset | CC0-1.0 | inspired-by |
 
-"Inspired-by" presets (e.g. a clean `linear`-style or `stripe`-style aesthetic) are clearly labeled as **presets inspired by public design conventions** — token choices only. They never ship a company's logo, wordmark, proprietary icon artwork, or anything meant to pass your site off as theirs. See [Legal & scope](#legal--scope).
+`inspired-by` packs capture a *convention* (a restrained, high-contrast editorial
+feel) as original token choices — never a copy of a proprietary system. Packs are
+the growth loop: each one is a one-file PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**Packs are the growth loop.** Every new pack is a reason for someone to share the project, and a one-file PR anyone can contribute. See [CONTRIBUTING.md](./CONTRIBUTING.md) for the pack format.
+## Method
 
-## Install
+```
+HTML/CSS  ─▶  fingerprint      ─▶  map                ─▶  rewrite           ─▶  prove
+              src/slop.js          pack tokens             src/apply.js          re-score
+  parse raw    named tells,        type · color roles ·    gradients→solid,      before → after,
+  markup +     weighted, capped    space · radius ·        Inter→pack sans,      itemized ledger,
+  inline CSS   → 0–100 score       shadow · motion         hex→accent, emoji,    write .html / -w
+                                                           inject token layer
+```
 
-Ships two ways, because the whole audience lives in one of them:
+Detection is pure pattern-matching over the raw markup and inline/`<style>` CSS —
+no network, no build, deterministic. The transformer performs an ordered pass of
+targeted rewrites driven by the pack's tokens and rules, then injects a single
+`:root` token layer so even unstyled elements inherit the system. Re-scoring the
+output closes the loop: the drop *is* the receipt.
+
+## Validation
 
 ```bash
-# CLI
-npx re-template <command>
-
-# Agent skill (Claude Code, Cursor, etc.) — reskin from inside your editor
-# (coming with v0.1 — see docs/)
+npm test        # 18 tests, node:test, no network
 ```
+
+The suite asserts the behavior the tool promises: the canonical slop page scores
+*heavy* and flags its marquee tells by id; a deliberately styled page scores
+*clean*; the score is clamped and monotonic; a reskin drops the score by 40+
+points to near-clean; gradient-clipped text and indigo hexes are actually gone
+from the output; emoji leave headings while the words stay; exactly one token
+layer is injected; re-applying never worsens the score; and **every shipped pack
+produces a valid reskin**. Packs are validated too — an incomplete pack, or one
+smuggling in a logo/wordmark/embedded image, fails loudly.
+
+## Setup
+
+No install required:
+
+```bash
+npx re-template score ./site
+npx re-template apply --pack primer ./site        # writes ./site/*.primer.html
+npx re-template apply --pack primer index.html -w # edits in place
+npx re-template diff  --pack material index.html
+npx re-template packs
+```
+
+From source (Node 18+):
+
+```bash
+git clone https://github.com/ninjahawk/Re-Template
+cd Re-Template
+npm test
+node bin/re-template.js score examples/slop/index.html
+```
+
+**Regenerating the demo.** The video is a real recording of the tool, not a
+mockup. It needs the dev dependencies (Playwright + a pure-JS GIF encoder) and a
+Chromium build:
+
+```bash
+npm install
+node tools/build-demo.js     # renders the real before/after into the stage
+node tools/record.js         # → media/demo.gif, media/demo.webm, media/still_*.png
+```
+
+## Limitations
+
+Detection is **static analysis** of the served markup and its inline/`<style>`
+CSS. It does not run a full layout engine, so styles injected at runtime by
+JavaScript, or pulled from external stylesheets the tool wasn't handed, are not
+followed — point it at the CSS you want read. The transformer rewrites
+system-level tokens (color, type, gradients, radius, elevation); it deliberately
+does not restructure layout or rewrite copy, so a page whose slop is purely
+structural will improve less than one whose slop is stylistic. Packs approximate a
+design system's *tokens*, not its component library. And the whole tool operates
+on *systems, not identities* by design — reskinning to a real brand's exact
+look-and-feel is out of scope, not a missing feature.
 
 ## Legal & scope
 
-Short version, from real case law (details and sources in [docs/RESEARCH.md](./docs/RESEARCH.md)):
+You generally **cannot copyright a UI's look-and-feel or layout** — a menu
+hierarchy is an uncopyrightable "method of operation" (*Lotus v. Borland*), and
+reimplementing an interface can be fair use (*Google v. Oracle*). What *is*
+protected is the expressive content *inside* the interface — logos, wordmarks,
+original icon artwork, source code — and, under trademark law, a distinctive
+**trade dress** that has acquired secondary meaning, where the violation is
+consumer *confusion* as to source. Re-Template is engineered around that line: it
+applies design *systems*, ships no identity assets, and is not an impersonation
+tool. Full case law and sources are in [docs/RESEARCH.md](docs/RESEARCH.md). None
+of this is legal advice.
 
-- **You generally can't copyright a UI's "look and feel" or its layout/method-of-operation.** *Lotus v. Borland* held a menu hierarchy is an uncopyrightable method of operation; *Google v. Oracle* held reimplementing an interface can be fair use. Reproducing a **design system** — a type scale, spacing rhythm, color roles, generic layout — sits in this open space.
-- **What IS protected:** the specific *expressive* content inside the interface — logos, wordmarks, original icon artwork, photography, and the literal source code. Re-Template packs never ship those.
-- **The real constraint is trade dress, not copyright.** Under the Lanham Act, a distinctive site "look and feel" can be protected if it has *secondary meaning* and is *nonfunctional* — and imitating it to the point a consumer thinks your site *is* that company is the line. Re-Template is a de-slopping tool, **not an impersonation tool**: it applies design *systems*, and refuses output that reads as a specific company's identity.
+## Acknowledgements
 
-If a pack ever crosses from "system" into "identity," that's a bug — open an issue.
+The launch packs are built on open-source design systems by their respective
+teams: [Primer](https://primer.style) (GitHub), [Material](https://m3.material.io)
+(Google), [Polaris](https://polaris.shopify.com) (Shopify), and
+[Carbon](https://carbondesignsystem.com) (IBM). Re-Template is an independent
+project and is not affiliated with, endorsed by, or sponsored by any of them.
 
-## Status
-
-`v0` — scaffolding and research. Roadmap, pack format, and the detection ruleset are being built in the open. Contributions and brand packs welcome now.
-
-## License
-
-[MIT](./LICENSE)
+Licensed under [MIT](LICENSE).

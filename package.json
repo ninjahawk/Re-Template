@@ -1,0 +1,39 @@
+{
+  "name": "re-template",
+  "version": "0.1.0",
+  "description": "Reskin AI-slop websites to a real, opinionated design language. Detect the vibe-coded look, then replace it — don't just strip it.",
+  "type": "module",
+  "bin": {
+    "re-template": "bin/re-template.js"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "packs"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "start": "node bin/re-template.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ai-slop",
+    "de-slop",
+    "design-system",
+    "vibe-coding",
+    "css",
+    "web-design",
+    "cli"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "gif-encoder-2": "^1.0.5",
+    "playwright": "^1.48.0",
+    "pngjs": "^7.0.0"
+  }
+}
