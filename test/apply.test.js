@@ -60,10 +60,23 @@ test('is idempotent-ish: re-applying does not worsen the score', () => {
 });
 
 test('every pack produces a valid reskin', () => {
-  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial']) {
+  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial', 'terminal']) {
     const pack = loadPack(id);
     const { html } = apply(slopHtml, pack);
     assert.match(html, new RegExp(`data-re-template="${id}"`));
     assert.ok(analyze(html).score < analyze(slopHtml).score);
   }
+});
+
+test('a pack with a dark role set emits theme-aware variables', () => {
+  const { html } = apply(slopHtml, loadPack('terminal'));
+  assert.match(html, /prefers-color-scheme:\s*dark/);
+  assert.match(html, /:root\[data-theme="dark"\]/);
+  assert.match(html, /--rt-canvas:#131314/i);   // dark canvas present
+  assert.match(html, /--rt-canvas:#ffffff/i);   // light canvas present
+});
+
+test('a pack without a dark role set stays single-theme', () => {
+  const { html } = apply(slopHtml, loadPack('primer'));
+  assert.doesNotMatch(html, /prefers-color-scheme:\s*dark/);
 });

@@ -72,9 +72,10 @@ async function main() {
 
   // Stills — three moments, mirroring a real product's "what the tool shows" trio.
   const stills = {
-    still_slop: 1200,      // the slop site, badge 84
-    still_apply: 4900,     // terminal mid-stream, checkmarks landing
-    still_clean: duration, // the reskinned site, badge 9
+    still_slop: 1200,   // the slop site, badge 84
+    still_apply: 4900,  // terminal mid-stream, checkmarks landing
+    still_clean: 6700,  // the reskinned site (light), badge 9, before the dark reveal
+    still_dark: 8600,   // same page, dark theme — the pack is theme-aware
   };
   for (const [name, t] of Object.entries(stills)) {
     await page.evaluate((tt) => window.seek(tt), t);

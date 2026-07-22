@@ -17,13 +17,13 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..');
 
 const beforeHtml = readFileSync(join(ROOT, 'examples', 'slop', 'index.html'), 'utf8');
-const pack = loadPack('primer');
+const pack = loadPack('terminal');
 const { html: afterHtml, changes } = apply(beforeHtml, pack);
 const beforeScore = analyze(beforeHtml).score;
 const afterScore = analyze(afterHtml).score;
 
 // The command and the ledger lines the terminal will show — taken from the real run.
-const command = 're-template apply --pack primer ./site';
+const command = 're-template apply --pack terminal ./site';
 const ledger = changes
   .filter((c) => c.id !== 'inject-pack')
   .map((c) => c.label + (c.count > 1 ? `  (×${c.count})` : ''));
@@ -139,7 +139,7 @@ D.ledger.forEach((line) => {
 });
 const ledgerRows = [...ledgerEl.children];
 
-const DURATION = 8600;
+const DURATION = 9600;
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 const ease = (x)=> x<=0?0 : x>=1?1 : 1-Math.pow(1-x,3);
 
@@ -200,11 +200,24 @@ function render(t){
   result.style.opacity = t > lastRow + 120 ? 1 : 0;
   result.innerHTML = 'slop <b style="color:#f85149">'+D.beforeScore+'</b> → <b style="color:#3fb950">'+D.afterScore+'</b> &nbsp;·&nbsp; reskinned to <b>'+D.packName+'</b>';
 
+  // Theme reveal: flip the reskinned page to dark, proving the pack is
+  // theme-aware (light + dark) exactly like a real design system. A short
+  // opacity dip around the midpoint reads as a smooth theme transition.
+  const flipMid = 7250, flipHalf = 200;
+  const afterFrame = document.getElementById('after');
+  const doc = afterFrame.contentDocument;
+  if (doc && doc.documentElement) {
+    doc.documentElement.setAttribute('data-theme', t >= flipMid ? 'dark' : 'light');
+  }
+  const dip = clamp(1 - Math.abs(t - flipMid) / flipHalf, 0, 1); // 0..1 triangle
+  afterFrame.style.opacity = (t > wipeEnd) ? (1 - 0.85 * dip) : 1;
+
   // Captions
   const cap = document.getElementById('caption');
   let capTxt = '', capOp = 0;
   if (t < 1400){ capTxt = 'Every AI-built site wears the same uniform.'; capOp = ease(clamp((t-200)/500,0,1)) * (t>1100?ease(clamp((1400-t)/300,0,1)):1); }
-  else if (t > wipeEnd + 200){ capTxt = 'Now it looks like a real team shipped it.'; capOp = ease(clamp((t-wipeEnd-200)/500,0,1)); }
+  else if (t > wipeEnd + 200 && t < flipMid + 100){ capTxt = 'Now it looks like a real team shipped it.'; capOp = ease(clamp((t-wipeEnd-200)/500,0,1)) * (t>flipMid-300?ease(clamp((flipMid+100-t)/300,0,1)):1); }
+  else if (t >= flipMid + 100){ capTxt = 'Light and dark, out of the box.'; capOp = ease(clamp((t-flipMid-100)/500,0,1)); }
   cap.textContent = capTxt; cap.style.opacity = capOp;
 }
 

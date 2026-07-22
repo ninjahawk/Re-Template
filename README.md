@@ -8,8 +8,8 @@
 
 [![Node](https://img.shields.io/badge/Node-18+-3C873A?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Runtime deps](https://img.shields.io/badge/runtime_deps-0-3fb950)](package.json)
-[![Brand packs](https://img.shields.io/badge/brand_packs-5-58a6ff)](packs/)
-[![Tests](https://img.shields.io/badge/tests-18_passing-3fb950)](test/)
+[![Brand packs](https://img.shields.io/badge/brand_packs-6-58a6ff)](packs/)
+[![Tests](https://img.shields.io/badge/tests-20_passing-3fb950)](test/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 **[▶ Watch the demo](media/demo.webm)** · **[📊 The research](docs/RESEARCH.md)** · **[🎨 Brand packs](packs/)** · **[🧩 Contribute a pack](CONTRIBUTING.md)**
@@ -72,18 +72,25 @@ emoji, the glow shadows — so the number is an explanation, not a verdict.
 
 ![The slop, scored and itemized](media/still_slop.png)
 
-**2. The fix is a real transform, not a delete key.** `apply --pack primer`
+**2. The fix is a real transform, not a delete key.** `apply --pack terminal`
 streams an explainable ledger: gradient headline → solid foreground, indigo hex →
 accent color, Inter → the pack's type family, over-rounded corners → the pack's
 radius, emoji removed from headings. Each line is a rewrite that actually ran.
 
 ![The reskin, as an explainable ledger](media/still_apply.png)
 
-**3. The result is a system, not a blank.** The same page, now inheriting
-Primer's type scale, color roles, spacing and elevation — **slop 9/100**. It
-doesn't look *stripped*; it looks like a team with a design system shipped it.
+**3. The result is a system, not a blank.** The same page, now inheriting the
+Terminal pack — Roboto, a neutral grey scale, a single blue accent, tabular
+numerals, hairline borders — **slop 9/100**. It doesn't look *stripped*; it looks
+like a team with a design system shipped it.
 
 ![The result: a real design language, not a blank](media/still_clean.png)
+
+**4. It ships light *and* dark, out of the box.** A pack with a dark role set
+becomes theme-aware exactly the way a real design system does it — follow the OS
+by default, honor an explicit `data-theme` override. Same page, one attribute:
+
+![The same reskin, dark theme](media/still_dark.png)
 
 ## Reading the report
 
@@ -123,15 +130,18 @@ documented system and the licensing is clean.
 
 | Pack | Based on | License | Kind |
 |------|----------|---------|------|
+| `terminal` ⭐ | market-terminal convention (Google Finance-style) | CC0-1.0 | inspired-by |
 | `primer` | GitHub Primer | MIT | open-source |
 | `material` | Google Material | Apache-2.0 | open-source |
 | `polaris` | Shopify Polaris | MIT | open-source |
 | `carbon` | IBM Carbon | Apache-2.0 | open-source |
-| `editorial` | inspired-by preset | CC0-1.0 | inspired-by |
+| `editorial` | restrained editorial convention | CC0-1.0 | inspired-by |
 
-`inspired-by` packs capture a *convention* (a restrained, high-contrast editorial
-feel) as original token choices — never a copy of a proprietary system. Packs are
-the growth loop: each one is a one-file PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
+The flagship **`terminal`** pack is the one in the demo above: Roboto, a Google-style
+neutral grey scale, a single blue accent, semantic up/down colors, tabular numerals,
+hairline borders, and a full **light + dark** theme. `inspired-by` packs capture a
+*convention* as original token choices — never a copy of a proprietary system. Packs
+are the growth loop: each one is a one-file PR. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Method
 
@@ -171,8 +181,8 @@ No install required:
 
 ```bash
 npx re-template score ./site
-npx re-template apply --pack primer ./site        # writes ./site/*.primer.html
-npx re-template apply --pack primer index.html -w # edits in place
+npx re-template apply --pack terminal ./site        # writes ./site/*.terminal.html
+npx re-template apply --pack terminal index.html -w # edits in place
 npx re-template diff  --pack material index.html
 npx re-template packs
 ```
@@ -224,10 +234,13 @@ of this is legal advice.
 
 ## Acknowledgements
 
-The launch packs are built on open-source design systems by their respective
+The open-source launch packs are built on design systems by their respective
 teams: [Primer](https://primer.style) (GitHub), [Material](https://m3.material.io)
 (Google), [Polaris](https://polaris.shopify.com) (Shopify), and
-[Carbon](https://carbondesignsystem.com) (IBM). Re-Template is an independent
-project and is not affiliated with, endorsed by, or sponsored by any of them.
+[Carbon](https://carbondesignsystem.com) (IBM). The flagship `terminal` pack and
+`editorial` are `inspired-by` presets — original token choices that evoke a public
+*convention* (a Google Finance-style market terminal; a restrained editorial feel),
+not copies of any proprietary system. Re-Template is an independent project and is
+not affiliated with, endorsed by, or sponsored by any of them.
 
 Licensed under [MIT](LICENSE).
