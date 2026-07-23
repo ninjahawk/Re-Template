@@ -9,7 +9,7 @@
 [![Node](https://img.shields.io/badge/Node-18+-3C873A?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Runtime deps](https://img.shields.io/badge/runtime_deps-0-3fb950)](package.json)
 [![Brand packs](https://img.shields.io/badge/brand_packs-7-58a6ff)](packs/)
-[![Tests](https://img.shields.io/badge/tests-20_passing-3fb950)](test/)
+[![Tests](https://img.shields.io/badge/tests-40_passing-3fb950)](test/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 **[▶ Watch the demo](media/demo.webm)** · **[📊 The research](docs/RESEARCH.md)** · **[🎨 Brand packs](packs/)** · **[🧩 Contribute a pack](CONTRIBUTING.md)**
@@ -109,12 +109,13 @@ by default, honor an explicit `data-theme` override. Same page, one attribute:
 ```text
 $ re-template score examples/slop/index.html
 
-  Slop score  84 / 100   █████████████████░░░  (heavy)
+  Slop score  96 / 100   ███████████████████░  (heavy)
 
   Tells found:
   ● indigo→purple gradient background          ×3   +24
   ● gradient-clipped headline text             ×2   +14
   ● raw indigo/violet hex colors               ×7   +12
+  ● emoji used as UI icons                     ×3   +12
   ● Inter / default system font, no type choice     +10
   ● over-rounded corners everywhere            ×4   +9
   ● emoji in headings                               +6
@@ -156,25 +157,35 @@ HTML/CSS  ─▶  fingerprint      ─▶  map                ─▶  rewrite   
 ```
 
 Detection is pure pattern-matching over the raw markup and inline/`<style>` CSS —
-no network, no build, deterministic. The transformer performs an ordered pass of
-targeted rewrites driven by the pack's tokens and rules, then injects a single
-`:root` token layer so even unstyled elements inherit the system. Re-scoring the
-output closes the loop: the drop *is* the receipt.
+no network, no build, deterministic. The transformer first **vaults** the regions
+it must never touch (`<script>`, `<pre>`, `<textarea>`, comments), then classifies
+components by their CSS signature and tags them by role, performs an ordered pass
+of targeted rewrites driven by the pack's tokens and rules, and injects a single
+`:root` token layer so even unstyled elements inherit the system — before
+restoring the vaulted regions verbatim. Re-scoring the output closes the loop: the
+drop *is* the receipt.
 
 ## Validation
 
 ```bash
-npm test        # 18 tests, node:test, no network
+npm test        # 40 tests, node:test, no network
 ```
 
-The suite asserts the behavior the tool promises: the canonical slop page scores
-*heavy* and flags its marquee tells by id; a deliberately styled page scores
-*clean*; the score is clamped and monotonic; a reskin drops the score by 40+
-points to near-clean; gradient-clipped text and indigo hexes are actually gone
-from the output; emoji leave headings while the words stay; exactly one token
-layer is injected; re-applying never worsens the score; and **every shipped pack
-produces a valid reskin**. Packs are validated too — an incomplete pack, or one
-smuggling in a logo/wordmark/embedded image, fails loudly.
+The suite asserts the behavior the tool promises. For the **reskin**: the
+canonical slop page scores *heavy* and flags its marquee tells by id; a
+deliberately styled page scores *clean*; the score is clamped and monotonic; a
+reskin drops the score by 40+ points to near-clean; gradient-clipped text and
+indigo hexes are gone from the output; emoji leave headings and icon tiles while
+the words stay; buttons and cards are re-proportioned; components are classified
+by CSS signature regardless of class name; **`<script>`/`<pre>`/`<textarea>` are
+never rewritten**; fixed-size shapes (avatars/icons) are not mistaken for pills;
+form fields, labels, and tables are normalized; exactly one token layer is
+injected; and re-applying never worsens the score. For the **reformat**: content
+extraction yields a coherent model, cards become a hairline table, output is
+deterministic and theme-aware, **no data is fabricated**, content is escaped, and
+junk/empty/malformed input never throws — it always emits a valid page. Packs are
+validated too — an incomplete pack, or one smuggling in a logo/wordmark/embedded
+image, fails loudly.
 
 ## Setup
 
@@ -214,7 +225,13 @@ There are two levels of "make it look like the author made it":
 
 - **`apply` — reskin.** Keeps the page's structure and rewrites the *system-level*
   choices (color, type, gradients, radius, elevation) plus the author's house
-  style (buttons, cards, kicker labels, nav). Same skeleton, the author's paint.
+  style (buttons, cards, kicker labels, nav, form fields, tables). Same skeleton,
+  the author's paint. Components are recognized by their **CSS signature, not
+  their class names** — a filled `<a>`/`<button>` is a primary action, a bordered
+  padded block is a card, a full-pill label is a kicker — so the house style lands
+  on the right elements no matter what a page named its classes. Executable regions
+  (`<script>`, `<pre>`, `<textarea>`, comments) are left byte-for-byte untouched:
+  a hex in `ctx.fillStyle='#8b5cf6'` is code, not a style token.
 - **`reformat` — rebuild the skeleton.** Reads the page into a semantic content
   model (brand, headline, subhead, action, capabilities, footer) and re-emits it
   in the author's *layout grammar*: a slim top bar, a hero framed as a restrained
@@ -233,17 +250,30 @@ npx re-template reformat --pack poke500 index.html   # → index.reformat.html
 
 ## Limitations
 
-Detection is **static analysis** of the served markup and its inline/`<style>`
-CSS. It does not run a full layout engine, so styles injected at runtime by
-JavaScript, or pulled from external stylesheets the tool wasn't handed, are not
-followed — point it at the CSS you want read. `apply` rewrites system-level
-tokens (color, type, gradients, radius, elevation) and house style without moving
-the layout; `reformat` goes further and rebuilds the skeleton, but from the
-static content it can extract — content rendered at runtime by JavaScript is not
-seen. Packs approximate a design system's *tokens* and layout conventions, not
-its full component library. And the whole tool operates
-on *systems, not identities* by design — reskinning to a real brand's exact
-look-and-feel is out of scope, not a missing feature.
+Everything is **static analysis** of the served markup and its inline/`<style>`
+CSS. It does not run a layout engine, so it only sees what's in the string it's
+handed:
+
+- **Runtime styles aren't reached.** CSS injected by JavaScript, CSS-in-JS, or
+  external stylesheets the tool wasn't given are invisible — point it at the CSS
+  you want read.
+- **Canvas/JS-drawn pixels aren't reached, by design.** On an interactive app,
+  `apply` reskins the *chrome* (nav, buttons, cards, headings) but cannot restyle
+  colors a script paints onto a `<canvas>` or embeds in JS — those regions are
+  deliberately left untouched so the app keeps working. The frame becomes the
+  pack's; the playfield stays the author's.
+- **`reformat` is for content pages.** It rebuilds a skeleton from extractable
+  content (brand, headline, capabilities…). Point it at an app (a game, a
+  canvas, a stateful UI) and it will emit a valid but empty shell — use `apply`
+  there instead.
+- **Extraction is heuristic.** Features are read as heading-plus-paragraph
+  pairs; a page that structures them differently, or renders them via JavaScript,
+  won't fully tabulate. It degrades to a smaller, clean page rather than failing.
+
+Packs approximate a design system's *tokens* and layout conventions, not its full
+component library. And the whole tool operates on *systems, not identities* by
+design — reskinning to a real brand's exact look-and-feel is out of scope, not a
+missing feature.
 
 ## Legal & scope
 
