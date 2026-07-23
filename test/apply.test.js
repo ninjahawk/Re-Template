@@ -76,13 +76,14 @@ test('removes emoji used as icons and decorations', () => {
   assert.ok(changes.some((c) => c.id === 'emoji-icon'), 'records the emoji-icon change');
 });
 
-test('fills cards with the accent, matching the buttons, with legible text', () => {
+test('gives cards a restrained surface (hairline + faint fill, no accent)', () => {
   const { html } = apply(slopHtml, primer);
   const layer = html.match(/<style data-re-template[^>]*>([\s\S]*?)<\/style>/i)[1];
-  // cards use the same accent fill the buttons do
-  assert.match(layer, /\.card[^{]*\{[^}]*background:var\(--rt-accent\)/);
-  // and their text flips to the accent foreground so it stays readable
-  assert.match(layer, /\.card[^)]*\)\s*:is\([^)]*\)\{color:var\(--rt-accent-fg\)/);
+  const cardRule = layer.match(/\.card[^{]*\{[^}]*\}/)[0];
+  assert.match(cardRule, /background:var\(--rt-canvas-subtle\)/);
+  assert.match(cardRule, /border:1px solid var\(--rt-border\)/);
+  // the accent is reserved for actions — cards are not filled with it
+  assert.doesNotMatch(cardRule, /background:var\(--rt-accent\)/);
 });
 
 test('injects exactly one pack token layer', () => {
