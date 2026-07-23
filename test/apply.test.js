@@ -76,14 +76,14 @@ test('removes emoji used as icons and decorations', () => {
   assert.ok(changes.some((c) => c.id === 'emoji-icon'), 'records the emoji-icon change');
 });
 
-test('gives cards a restrained surface (hairline + faint fill, no accent)', () => {
+test('cards are flat, hairline-delineated blocks — not filled boxes', () => {
   const { html } = apply(slopHtml, primer);
   const layer = html.match(/<style data-re-template[^>]*>([\s\S]*?)<\/style>/i)[1];
   const cardRule = layer.match(/\.card[^{]*\{[^}]*\}/)[0];
-  assert.match(cardRule, /background:var\(--rt-canvas-subtle\)/);
-  assert.match(cardRule, /border:1px solid var\(--rt-border\)/);
-  // the accent is reserved for actions — cards are not filled with it
-  assert.doesNotMatch(cardRule, /background:var\(--rt-accent\)/);
+  // no fill, no box border, no radius — just a single top hairline
+  assert.match(cardRule, /background:transparent/);
+  assert.match(cardRule, /border-top:1px solid var\(--rt-border\)/);
+  assert.doesNotMatch(cardRule, /background:var\(--rt-(accent|canvas-subtle)\)/);
 });
 
 test('injects exactly one pack token layer', () => {

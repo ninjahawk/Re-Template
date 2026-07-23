@@ -65,10 +65,13 @@ code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
    we impose that, not just the fill. (Also fixes light-on-light text: a CTA whose
    slop gradient became a subtle canvas fill would otherwise vanish.) */
 .rt-btn,button,.btn,.cta,a.cta,[role="button"],input[type="submit"],input[type="button"]{display:inline-block;padding:.5rem 1.1rem;border:1px solid transparent;border-radius:var(--rt-radius);background:var(--rt-accent);color:var(--rt-accent-fg);font-family:var(--rt-sans);font-size:.875rem;font-weight:500;line-height:1.5;text-decoration:none;cursor:pointer;}
-/* Cards are defined by a hairline and a faint surface one step off the canvas —
-   restrained, the way a data-terminal delineates a panel. No fill, no heavy
-   shadow; the accent stays reserved for genuine actions like the buttons. */
-.rt-card,.card,[class*="card"],.panel,.tile{background:var(--rt-canvas-subtle);border:1px solid var(--rt-border);border-radius:var(--rt-radius);box-shadow:none;}
+/* Cards aren't boxes in this hand. A data-terminal author doesn't wrap content
+   in a filled, rounded, bordered card — he delineates with a single hairline and
+   lets whitespace do the rest. So drop the fill, border box, radius and shadow;
+   mark each block with one top rule, and keep the title quiet (medium, not bold)
+   so it sits with the rest of the page instead of shouting. */
+.rt-card,.card,[class*="card"],.panel,.tile{background:transparent;border:0;border-top:1px solid var(--rt-border);border-radius:0;box-shadow:none;}
+:is(.rt-card,.card,[class*="card"],.panel,.tile) :is(h1,h2,h3,h4,h5,h6){font-weight:500;}
 /* The author's house style — the details that make it read as *his* page, not a
    recolored one. Kicker/eyebrow labels are small, quiet, uppercase (never a
    colored badge). Nav is muted ink that warms to the accent on hover. So the one
