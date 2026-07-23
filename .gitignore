@@ -6,4 +6,5 @@ examples/**/*.material.html
 examples/**/*.polaris.html
 examples/**/*.carbon.html
 examples/**/*.editorial.html
+examples/**/*.terminal.html
 *.log
