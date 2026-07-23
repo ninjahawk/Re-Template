@@ -58,10 +58,13 @@ h1,h2,h3,h4{font-family:var(--rt-sans);color:var(--rt-fg);letter-spacing:-0.01em
 h1{font-size:${(scale[scale.length - 1] || 40) / 16}rem;font-weight:500;}
 a{color:var(--rt-accent);}
 code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
-/* Primary actions get a real, filled button in the pack's language — otherwise a
-   CTA whose slop gradient became a subtle canvas fill turns into invisible
-   light-on-light text. The injected layer loads last, so these win the cascade. */
-.rt-btn,button,.btn,.cta,a.cta,[role="button"],input[type="submit"],input[type="button"]{border-radius:var(--rt-radius);background:var(--rt-accent);color:var(--rt-accent-fg);border:1px solid transparent;}
+/* Primary actions get a real, filled button in the pack's language — and in the
+   pack's *proportions*. Recoloring a vibe-coded CTA isn't enough: its fat padding
+   and heavy 17px text read as a different site next to the restrained page. The
+   author's button is modest — snug padding, medium weight, normal text size — so
+   we impose that, not just the fill. (Also fixes light-on-light text: a CTA whose
+   slop gradient became a subtle canvas fill would otherwise vanish.) */
+.rt-btn,button,.btn,.cta,a.cta,[role="button"],input[type="submit"],input[type="button"]{display:inline-block;padding:.5rem 1.1rem;border:1px solid transparent;border-radius:var(--rt-radius);background:var(--rt-accent);color:var(--rt-accent-fg);font-family:var(--rt-sans);font-size:.875rem;font-weight:500;line-height:1.5;text-decoration:none;cursor:pointer;}
 /* Cards are defined by a hairline and a faint surface one step off the canvas —
    restrained, the way a data-terminal delineates a panel. No fill, no heavy
    shadow; the accent stays reserved for genuine actions like the buttons. */
