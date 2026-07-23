@@ -62,10 +62,11 @@ code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
    CTA whose slop gradient became a subtle canvas fill turns into invisible
    light-on-light text. The injected layer loads last, so these win the cascade. */
 .rt-btn,button,.btn,.cta,a.cta,[role="button"],input[type="submit"],input[type="button"]{border-radius:var(--rt-radius);background:var(--rt-accent);color:var(--rt-accent-fg);border:1px solid transparent;}
-/* Cards get their own surface, one step off the canvas, with a real hairline and
-   restrained elevation — so they read as crafted panels instead of flat boxes
-   that blend into the page. */
-.rt-card,.card,[class*="card"],.panel,.tile{background:var(--rt-canvas-subtle);border:1px solid var(--rt-border);border-radius:var(--rt-radius);box-shadow:var(--rt-shadow);}
+/* Cards are filled with the accent — the same color as the buttons — and their
+   text flips to the accent foreground so it stays legible on the fill. Resolves
+   through the theme tokens, so it stays correct in light and dark. */
+.rt-card,.card,[class*="card"],.panel,.tile{background:var(--rt-accent);color:var(--rt-accent-fg);border:1px solid transparent;border-radius:var(--rt-radius);box-shadow:var(--rt-shadow);}
+:is(.rt-card,.card,[class*="card"],.panel,.tile) :is(h1,h2,h3,h4,h5,h6,p,li,a,span,strong,small){color:var(--rt-accent-fg);}
 `.trim();
 }
 
