@@ -8,7 +8,7 @@
 
 [![Node](https://img.shields.io/badge/Node-18+-3C873A?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Runtime deps](https://img.shields.io/badge/runtime_deps-0-3fb950)](package.json)
-[![Brand packs](https://img.shields.io/badge/brand_packs-6-58a6ff)](packs/)
+[![Brand packs](https://img.shields.io/badge/brand_packs-7-58a6ff)](packs/)
 [![Tests](https://img.shields.io/badge/tests-20_passing-3fb950)](test/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
@@ -131,6 +131,7 @@ documented system and the licensing is clean.
 | Pack | Based on | License | Kind |
 |------|----------|---------|------|
 | `terminal` ⭐ | market-terminal convention (Google Finance-style) | CC0-1.0 | inspired-by |
+| `poke500` | market-data index convention (finance-terminal style) | CC0-1.0 | inspired-by |
 | `primer` | GitHub Primer | MIT | open-source |
 | `material` | Google Material | Apache-2.0 | open-source |
 | `polaris` | Shopify Polaris | MIT | open-source |

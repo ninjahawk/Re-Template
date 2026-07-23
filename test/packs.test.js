@@ -4,7 +4,7 @@ import { listPacks, loadPack, validatePack } from '../src/packs.js';
 
 test('ships the launch brand packs', () => {
   const packs = listPacks();
-  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial', 'terminal']) {
+  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial', 'terminal', 'poke500']) {
     assert.ok(packs.includes(id), `missing pack ${id}`);
   }
 });

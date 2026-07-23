@@ -7,4 +7,5 @@ examples/**/*.polaris.html
 examples/**/*.carbon.html
 examples/**/*.editorial.html
 examples/**/*.terminal.html
+examples/**/*.poke500.html
 *.log

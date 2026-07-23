@@ -1,0 +1,57 @@
+{
+  "id": "poke500",
+  "name": "Poké 500-style",
+  "basedOn": "a market-data index convention (finance-terminal style)",
+  "license": "CC0-1.0",
+  "kind": "inspired-by",
+  "attribution": "Token choices evoking a restrained market-index / finance-terminal convention — Roboto with a tabular-numeral data face, a neutral grey scale on white, a single blue accent, and semantic up/down colors. Not a copy of any proprietary design system, and it ships no logo, wordmark, or identity artwork.",
+  "tokens": {
+    "font": {
+      "sans": "Roboto, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif",
+      "mono": "'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace",
+      "scale": [11, 12, 13, 14, 16, 21, 24, 44],
+      "weight": { "normal": 400, "medium": 500 },
+      "lineHeight": { "tight": 1.15, "normal": 1.5 }
+    },
+    "color": {
+      "roles": {
+        "canvas": "#ffffff",
+        "canvasSubtle": "#f8f9fa",
+        "fg": "#202124",
+        "muted": "#5f6368",
+        "accent": "#1a73e8",
+        "accentFg": "#ffffff",
+        "success": "#137333",
+        "danger": "#a50e0e",
+        "border": "#dadce0"
+      },
+      "rolesDark": {
+        "canvas": "#131314",
+        "canvasSubtle": "#1e1f20",
+        "fg": "#e3e3e3",
+        "muted": "#9aa0a6",
+        "accent": "#8ab4f8",
+        "accentFg": "#131314",
+        "success": "#81c995",
+        "danger": "#f28b82",
+        "border": "#444746"
+      }
+    },
+    "space": [4, 8, 12, 16, 20, 24, 32, 48],
+    "radius": { "sm": 6, "md": 8, "lg": 12, "full": 9999 },
+    "shadow": {
+      "sm": "0 1px 2px rgba(0,0,0,0.05)",
+      "md": "0 1px 2px rgba(0,0,0,0.08)",
+      "lg": "0 2px 8px rgba(0,0,0,0.12)"
+    },
+    "motion": { "fast": "100ms", "normal": "180ms", "easing": "cubic-bezier(0.2, 0, 0, 1)" }
+  },
+  "rules": {
+    "killGradientText": true,
+    "killGlowOnDark": true,
+    "maxAccentHues": 1,
+    "preferSystemFont": false,
+    "flattenOverRoundedCorners": true,
+    "demoteEmojiHeadings": true
+  }
+}

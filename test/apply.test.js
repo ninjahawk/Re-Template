@@ -60,7 +60,7 @@ test('is idempotent-ish: re-applying does not worsen the score', () => {
 });
 
 test('every pack produces a valid reskin', () => {
-  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial', 'terminal']) {
+  for (const id of ['primer', 'material', 'polaris', 'carbon', 'editorial', 'terminal', 'poke500']) {
     const pack = loadPack(id);
     const { html } = apply(slopHtml, pack);
     assert.match(html, new RegExp(`data-re-template="${id}"`));

@@ -58,7 +58,10 @@ h1,h2,h3,h4{font-family:var(--rt-sans);color:var(--rt-fg);letter-spacing:-0.01em
 h1{font-size:${(scale[scale.length - 1] || 40) / 16}rem;font-weight:500;}
 a{color:var(--rt-accent);}
 code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
-.rt-btn,button,.btn{border-radius:var(--rt-radius);}
+/* Primary actions get a real, filled button in the pack's language — otherwise a
+   CTA whose slop gradient became a subtle canvas fill turns into invisible
+   light-on-light text. The injected layer loads last, so these win the cascade. */
+.rt-btn,button,.btn,.cta,a.cta,[role="button"],input[type="submit"],input[type="button"]{border-radius:var(--rt-radius);background:var(--rt-accent);color:var(--rt-accent-fg);border:1px solid transparent;}
 `.trim();
 }
 
@@ -68,6 +71,19 @@ export function apply(source, pack) {
   const changes = [];
   const record = (id, label, n) => { if (n > 0) changes.push({ id, label, count: n }); };
   const rules = pack.rules || {};
+
+  // 0. Pre-pass: in any rule block that clips its background to text, drop the
+  // gradient fill outright. Otherwise, once we neutralize `background-clip:text`
+  // below, the gradient that fed the clip survives as a visible colored box
+  // behind the (now solid) headline. A clipped-text gradient is decoration for
+  // the glyphs, not a real background — so it should vanish, not become a fill.
+  html = html.replace(/\{[^{}]*\}/g, (block) => {
+    if (!/background-clip\s*:\s*text/i.test(block)) return block;
+    return block.replace(
+      /background(-image)?\s*:\s*(?:linear|radial|conic)-gradient\([^;}]*\)\s*;?/gi,
+      'background:transparent;',
+    );
+  });
 
   // 1. Gradient-clipped text → solid foreground. Kill the clip, restore the fill.
   let n = 0;
@@ -113,11 +129,17 @@ export function apply(source, pack) {
     record('over-rounded', 'over-rounded corners → pack radius', n);
   }
 
-  // 7. Colored glow shadows → restrained pack elevation.
+  // 7. Colored glow shadows → restrained pack elevation. A "glow" is a shadow
+  // that carries a color *and* a large blur/offset — regardless of which comes
+  // first (e.g. `0 30px 80px rgba(...)` puts the big radius before the color).
   if (rules.killGlowOnDark !== false) {
     n = 0;
-    html = html.replace(/box-shadow\s*:[^;}]*(?:rgba?\([^)]*\)|#[0-9a-f]{3,8})[^;}]*\b(?:[2-9]\d|\d{3,})px[^;}]*;?/gi,
-      () => (n++, 'box-shadow:var(--rt-shadow);'));
+    html = html.replace(/box-shadow\s*:\s*([^;}]*);?/gi, (m, value) => {
+      const hasColor = /rgba?\([^)]*\)|#[0-9a-f]{3,8}/i.test(value);
+      const hasBigBlur = /\b(?:[2-9]\d|\d{3,})px\b/.test(value);
+      if (hasColor && hasBigBlur) { n++; return 'box-shadow:var(--rt-shadow);'; }
+      return m;
+    });
     record('glow-on-dark', 'colored glow → restrained elevation', n);
   }
 
