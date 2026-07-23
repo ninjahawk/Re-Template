@@ -227,10 +227,10 @@ export function apply(source, pack) {
   // buttons re-assert their accent-on-fill label through the injected layer.
   n = 0;
   html = html.replace(
-    /(?<![-\w])color\s*:\s*(#fff(?:fff)?|#fefefe|#fcfcfc|#fafafa|#f9fafb|#f8f9fa|#f3f4f6|#f1f5f9|#e5e7eb|#e2e8f0|white|rgba?\(\s*255\s*,\s*255\s*,\s*255\b[^)]*\))/gi,
+    /(?<![-\w])color\s*:\s*(#fff(?:fff)?|#fefefe|#fcfcfc|#fafafa|#f9fafb|#f8f9fa|#f3f4f6|#f1f5f9|#e5e7eb|#e2e8f0|white|rgba?\(\s*255\s*,\s*255\s*,\s*255\b[^)]*\)|#c7d2fe|#ddd6fe|#e0e7ff|#eef2ff|#e0f2fe|#dbeafe|#bfdbfe|#cbd5e1|#e2e8f0|#ede9fe|#f5f3ff|#ecfeff)/gi,
     () => (n++, 'color:var(--rt-fg)'),
   );
-  record('white-text', 'near-white text (for a dark hero) → pack foreground', n);
+  record('white-text', 'light text (for a dark hero) → pack foreground', n);
 
   // 4. Inter / default font declarations → pack sans.
   n = 0;
