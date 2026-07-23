@@ -66,6 +66,13 @@ code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
    restrained, the way a data-terminal delineates a panel. No fill, no heavy
    shadow; the accent stays reserved for genuine actions like the buttons. */
 .rt-card,.card,[class*="card"],.panel,.tile{background:var(--rt-canvas-subtle);border:1px solid var(--rt-border);border-radius:var(--rt-radius);box-shadow:none;}
+/* The author's house style — the details that make it read as *his* page, not a
+   recolored one. Kicker/eyebrow labels are small, quiet, uppercase (never a
+   colored badge). Nav is muted ink that warms to the accent on hover. So the one
+   accent stays reserved for real actions and the whole thing feels authored. */
+.eyebrow,[class*="eyebrow"],[class*="kicker"],[class*="overline"]{color:var(--rt-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;font-size:.6875rem;}
+nav a,nav .links,header nav a{color:var(--rt-muted);}
+nav a:hover,nav .links:hover{color:var(--rt-fg);}
 `.trim();
 }
 
