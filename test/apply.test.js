@@ -47,6 +47,17 @@ test('strips emoji from headings but keeps the words', () => {
   assert.doesNotMatch(h1, /🚀/u);
 });
 
+test('de-pills the eyebrow badge: no bubble fill, no leading dot', () => {
+  const { html, changes } = apply(slopHtml, primer);
+  // the eyebrow rule keeps its huge radius but loses the tinted background fill
+  const eyebrow = html.match(/\.eyebrow\s*\{[^}]*\}/i)[0];
+  assert.doesNotMatch(eyebrow, /background\s*:/i, 'eyebrow should have no background fill');
+  // the leading ● dot is stripped from the label text
+  assert.doesNotMatch(html, />\s*●\s*Now with AI/);
+  assert.match(html, />Now with AI superpowers</);
+  assert.ok(changes.some((c) => c.id === 'eyebrow-pill'), 'records the eyebrow-pill change');
+});
+
 test('injects exactly one pack token layer', () => {
   const { html } = apply(slopHtml, primer);
   const layers = html.match(/data-re-template=/g) || [];

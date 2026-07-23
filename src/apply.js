@@ -120,6 +120,32 @@ export function apply(source, pack) {
     (m, prop) => { n++; return prop === 'text' ? 'rt-text-accent' : prop === 'bg' ? 'rt-bg-accent' : ''; });
   record('tailwind-indigo', 'Tailwind indigo/purple utilities → accent', n);
 
+  // 5b. De-pill "eyebrow"/badge chips. The vibe-coded eyebrow is an inline label
+  // wrapped in a full-radius pill with a tinted fill and a leading ● dot. Real
+  // design languages set an eyebrow as plain (usually small, muted) text — no
+  // bubble. So strip the fill/border/shadow off any painted full pill, and drop
+  // the leading dot glyph. Runs before the radius pass, while the pill is still
+  // recognizable by its huge border-radius.
+  if (rules.demoteEyebrowPills !== false) {
+    n = 0;
+    // (a) CSS: a rule that rounds into a full pill (≥100px radius) *and* paints a
+    //     background is a chip — remove what makes it a bubble.
+    html = html.replace(/\{[^{}]*\}/g, (block) => {
+      const isPill = /border-radius\s*:\s*\d{3,}px/i.test(block);
+      if (!isPill || !/background(-color|-image)?\s*:/i.test(block)) return block;
+      n++;
+      return block
+        .replace(/background(-color|-image)?\s*:[^;}]*;?/gi, '')
+        .replace(/border\s*:[^;}]*;?/gi, '')
+        .replace(/box-shadow\s*:[^;}]*;?/gi, '');
+    });
+    // (b) Tailwind: the rounded-full pill utility.
+    html = html.replace(/\brounded-full\b/g, () => (n++, ''));
+    // (c) Leading dot glyph that opens an inline label (e.g. `>● Now with…`).
+    html = html.replace(/(>)\s*[●•]\s*/g, (m, gt) => (n++, gt));
+    record('eyebrow-pill', 'eyebrow pill badge → plain label', n);
+  }
+
   // 6. Over-rounded corners → pack radius.
   if (rules.flattenOverRoundedCorners !== false) {
     n = 0;
