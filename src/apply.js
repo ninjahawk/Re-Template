@@ -76,10 +76,72 @@ code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
    recolored one. Kicker/eyebrow labels are small, quiet, uppercase (never a
    colored badge). Nav is muted ink that warms to the accent on hover. So the one
    accent stays reserved for real actions and the whole thing feels authored. */
-.eyebrow,[class*="eyebrow"],[class*="kicker"],[class*="overline"]{color:var(--rt-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;font-size:.6875rem;}
-nav a,nav .links,header nav a{color:var(--rt-muted);}
-nav a:hover,nav .links:hover{color:var(--rt-fg);}
+.rt-kicker,.eyebrow,[class*="eyebrow"],[class*="kicker"],[class*="overline"]{color:var(--rt-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;font-size:.6875rem;}
+nav a,nav li,nav span,nav .links,header nav a,header nav span{color:var(--rt-muted);}
+nav a:hover,nav li:hover,nav span:hover,nav .links:hover{color:var(--rt-fg);}
 `.trim();
+}
+
+// Build a rough `class name -> declaration text` map from the page's own CSS, so
+// we can recognize a component by what it *looks like* rather than what it's
+// named. Declarations for a class accumulate across rules (base + media queries).
+function classDeclarations(html) {
+  const css = (html.match(/<style[^>]*>[\s\S]*?<\/style>/gi) || []).join('\n');
+  const map = new Map();
+  const ruleRe = /([^{}]+)\{([^{}]+)\}/g;
+  let m;
+  while ((m = ruleRe.exec(css))) {
+    const decls = m[2];
+    for (const cls of m[1].match(/\.[-\w]+/g) || []) {
+      const name = cls.slice(1);
+      map.set(name, (map.get(name) || '') + ';' + decls);
+    }
+  }
+  return map;
+}
+
+// Signature predicates over a declaration block — the "does it look like…" tests.
+const hasFill = (d) => /background(-image)?\s*:\s*(?:linear|radial|conic)-gradient/i.test(d)
+  || /background(-color)?\s*:\s*(?!\s*(?:transparent|none|inherit|initial|unset)\b)(?:#|rgb|hsl|var\(|[a-z])/i.test(d);
+const hasRadius = (d) => /border-radius\s*:/i.test(d);
+const hasPadding = (d) => /(?:^|;|\s)padding(?:-\w+)?\s*:/i.test(d);
+const hasBorder = (d) => /(?:^|;|\s)border\s*:\s*(?!0\b|none\b)/i.test(d);
+const hasShadow = (d) => /box-shadow\s*:\s*(?!none\b)/i.test(d);
+const isPillRadius = (d) => /border-radius\s*:\s*\d{3,}px/i.test(d);
+
+// A filled anchor/button is a primary action; a bordered, padded, rounded block
+// is a card; a full-pill label is a kicker. `looksLike` returns the role marker.
+function roleFor(tag, decls) {
+  const t = tag.toLowerCase();
+  if (t === 'a' || t === 'button') {
+    if (hasFill(decls) && (hasRadius(decls) || hasPadding(decls))) return 'rt-btn';
+    return null;
+  }
+  if (isPillRadius(decls) && hasFill(decls)) return 'rt-kicker';
+  if (hasRadius(decls) && hasPadding(decls) && (hasBorder(decls) || hasShadow(decls) || hasFill(decls))) return 'rt-card';
+  return null;
+}
+
+// Tag every classed element with its role marker, so the injected layer can style
+// it by role no matter what its classes are named. This is what makes the "hand"
+// generalize past the one demo page's class names.
+function tagRoles(html) {
+  const rules = classDeclarations(html);
+  let n = 0;
+  html = html.replace(/<([a-zA-Z][\w-]*)\b([^>]*?)class=("|')([^"']*)\3([^>]*)>/g, (full, tag, pre, q, cls, post) => {
+    if (/\brt-(btn|card|kicker)\b/.test(cls)) return full; // idempotent
+    let role = null;
+    for (const name of cls.split(/\s+/)) {
+      const d = rules.get(name);
+      if (!d) continue;
+      role = roleFor(tag, d);
+      if (role) break;
+    }
+    if (!role) return full;
+    n++;
+    return `<${tag}${pre}class=${q}${cls} ${role}${q}${post}>`;
+  });
+  return { html, n };
 }
 
 // A single ordered pass of textual rewrites. Each entry records its own count.
@@ -87,6 +149,15 @@ export function apply(source, pack) {
   let html = String(source || '');
   const changes = [];
   const record = (id, label, n) => { if (n > 0) changes.push({ id, label, count: n }); };
+
+  // 0. Classify components by their CSS signature and tag them with a role
+  //    marker (rt-btn / rt-card / rt-kicker), so the pack's house style lands on
+  //    the right elements regardless of what the source named its classes.
+  {
+    const tagged = tagRoles(html);
+    html = tagged.html;
+    record('role-tag', 'components classified by role (button/card/kicker)', tagged.n);
+  }
   const rules = pack.rules || {};
 
   // 0. Pre-pass: in any rule block that clips its background to text, drop the

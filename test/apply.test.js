@@ -86,6 +86,23 @@ test('cards are flat, hairline-delineated blocks — not filled boxes', () => {
   assert.doesNotMatch(cardRule, /background:var\(--rt-(accent|canvas-subtle)\)/);
 });
 
+test('classifies components by CSS signature, not class name', () => {
+  // a page whose classes are named nothing like the demo's
+  const page = `<!doctype html><html><head><style>
+    .signup{background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:14px;padding:14px 30px;color:#fff}
+    .feature{background:#fff;border:1px solid #eee;border-radius:20px;padding:28px;box-shadow:0 20px 60px rgba(99,102,241,.3)}
+    .tag{background:rgba(99,102,241,.15);border-radius:9999px;padding:6px 14px;color:#a5b4fc}
+  </style></head><body>
+    <span class="tag">New</span>
+    <a class="signup" href="#">Start free trial</a>
+    <div class="feature"><h3>Fast</h3><p>Very fast.</p></div>
+  </body></html>`;
+  const { html } = apply(page, loadPack('poke500'));
+  assert.match(html, /<a class="signup rt-btn"/, 'filled anchor tagged as a button');
+  assert.match(html, /<div class="feature rt-card"/, 'bordered padded block tagged as a card');
+  assert.match(html, /<span class="tag rt-kicker"/, 'full-pill label tagged as a kicker');
+});
+
 test('injects exactly one pack token layer', () => {
   const { html } = apply(slopHtml, primer);
   const layers = html.match(/data-re-template=/g) || [];
