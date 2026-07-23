@@ -103,6 +103,42 @@ test('classifies components by CSS signature, not class name', () => {
   assert.match(html, /<span class="tag rt-kicker"/, 'full-pill label tagged as a kicker');
 });
 
+test('never rewrites inside <script>, <pre>, or <textarea>', () => {
+  const page = `<!doctype html><head><style>.hero{background:#6366f1;font-family:Inter}</style></head>
+  <body><h1>Demo</h1>
+  <script>const c={fill:'#6366f1'};ctx.fillStyle='#8b5cf6';const f='Inter';/*border-radius:24px*/</script>
+  <pre>.box{ background:#6366f1; border-radius: 24px; font-family: Inter; }</pre>
+  <textarea>#6366f1 Inter</textarea></body>`;
+  const { html } = apply(page, primer);
+  // CSS in <style> is transformed…
+  assert.match(html, /--rt-accent/);
+  // …but the script's code, the code sample, and the textarea are byte-for-byte intact
+  assert.match(html, /ctx\.fillStyle='#8b5cf6'/);
+  assert.match(html, /const c=\{fill:'#6366f1'\}/);
+  assert.match(html, /<pre>\.box\{ background:#6366f1; border-radius: 24px; font-family: Inter; \}<\/pre>/);
+  assert.match(html, /<textarea>#6366f1 Inter<\/textarea>/);
+});
+
+test('does not de-pill a fixed-size shape (avatar/icon), only text pills', () => {
+  const page = `<!doctype html><head><style>
+    .avatar{width:96px;height:96px;border-radius:9999px;background:linear-gradient(135deg,#6366f1,#a855f7)}
+    .eyebrow{padding:6px 14px;border-radius:9999px;background:rgba(99,102,241,.2)}
+  </style></head><body><div class="avatar"></div><span class="eyebrow">New</span></body>`;
+  const { html } = apply(page, primer);
+  // the shaped element keeps a background (not stripped) and isn't tagged a kicker
+  assert.match(html, /\.avatar\{[^}]*background:/);
+  assert.doesNotMatch(html, /class="avatar rt-kicker"/);
+  // the text pill is still de-pilled (background removed)
+  assert.match(html, /\.eyebrow\{(?:(?!background:)[^}])*\}/);
+});
+
+test('normalizes form fields, labels, and table headers', () => {
+  const { html } = apply(slopHtml, primer);
+  const layer = html.match(/<style data-re-template[^>]*>([\s\S]*?)<\/style>/i)[1];
+  assert.match(layer, /textarea[^{]*\{[^}]*border:1px solid var\(--rt-border\)/);
+  assert.match(layer, /label,th\{color:var\(--rt-muted\)/);
+});
+
 test('injects exactly one pack token layer', () => {
   const { html } = apply(slopHtml, primer);
   const layers = html.match(/data-re-template=/g) || [];

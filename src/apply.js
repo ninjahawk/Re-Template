@@ -79,6 +79,12 @@ code,kbd,samp,.rt-mono,.ticker{font-family:var(--rt-mono);}
 .rt-kicker,.eyebrow,[class*="eyebrow"],[class*="kicker"],[class*="overline"]{color:var(--rt-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:500;font-size:.6875rem;}
 nav a,nav li,nav span,nav .links,header nav a,header nav span{color:var(--rt-muted);}
 nav a:hover,nav li:hover,nav span:hover,nav .links:hover{color:var(--rt-fg);}
+/* Form fields become clean, thin-bordered inputs on the canvas — not the dark,
+   over-rounded, indigo-bordered blobs a vibe-coded page ships. Field labels and
+   table headers are quiet muted text, never a colored shout. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="submit"]):not([type="button"]),textarea,select{background:var(--rt-canvas);color:var(--rt-fg);border:1px solid var(--rt-border);border-radius:var(--rt-radius);}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--rt-accent);}
+label,th{color:var(--rt-muted);font-weight:500;}
 `.trim();
 }
 
@@ -108,6 +114,9 @@ const hasPadding = (d) => /(?:^|;|\s)padding(?:-\w+)?\s*:/i.test(d);
 const hasBorder = (d) => /(?:^|;|\s)border\s*:\s*(?!0\b|none\b)/i.test(d);
 const hasShadow = (d) => /box-shadow\s*:\s*(?!none\b)/i.test(d);
 const isPillRadius = (d) => /border-radius\s*:\s*\d{3,}px/i.test(d);
+// A fixed width *and* height means a shaped element — an avatar, an icon, a
+// logo dot — not a text label. Those must never be treated as eyebrow pills.
+const isShaped = (d) => /(?:^|[;{]|\s)width\s*:/i.test(d) && /(?:^|[;{]|\s)height\s*:/i.test(d);
 
 // A filled anchor/button is a primary action; a bordered, padded, rounded block
 // is a card; a full-pill label is a kicker. `looksLike` returns the role marker.
@@ -117,7 +126,7 @@ function roleFor(tag, decls) {
     if (hasFill(decls) && (hasRadius(decls) || hasPadding(decls))) return 'rt-btn';
     return null;
   }
-  if (isPillRadius(decls) && hasFill(decls)) return 'rt-kicker';
+  if (isPillRadius(decls) && hasFill(decls) && !isShaped(decls)) return 'rt-kicker';
   if (hasRadius(decls) && hasPadding(decls) && (hasBorder(decls) || hasShadow(decls) || hasFill(decls))) return 'rt-card';
   return null;
 }
@@ -149,6 +158,19 @@ export function apply(source, pack) {
   let html = String(source || '');
   const changes = [];
   const record = (id, label, n) => { if (n > 0) changes.push({ id, label, count: n }); };
+
+  // Vault regions that are not CSS and must never be rewritten as if they were:
+  // executable JS (a hex in `ctx.fillStyle='#8b5cf6'` is code, not a style token),
+  // code samples, editable text, and comments. We swap them for inert sentinels,
+  // run the pipeline, then restore them verbatim. `<style>` is intentionally left
+  // in place — that is exactly the CSS we do want to transform.
+  const vault = [];
+  const stash = (re) => { html = html.replace(re, (m) => `RT${vault.push(m) - 1}`); };
+  stash(/<script\b[^>]*>[\s\S]*?<\/script>/gi);
+  stash(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi);
+  stash(/<textarea\b[^>]*>[\s\S]*?<\/textarea>/gi);
+  stash(/<!--[\s\S]*?-->/g);
+  const unstash = (s) => s.replace(/RT(\d+)/g, (_, i) => vault[+i]);
 
   // 0. Classify components by their CSS signature and tag them with a role
   //    marker (rt-btn / rt-card / rt-kicker), so the pack's house style lands on
@@ -234,6 +256,7 @@ export function apply(source, pack) {
     html = html.replace(/\{[^{}]*\}/g, (block) => {
       const isPill = /border-radius\s*:\s*\d{3,}px/i.test(block);
       if (!isPill || !/background(-color|-image)?\s*:/i.test(block)) return block;
+      if (isShaped(block)) return block; // an avatar/icon/logo dot, not a text pill
       n++;
       return block
         .replace(/background(-color|-image)?\s*:[^;}]*;?/gi, '')
@@ -324,5 +347,5 @@ export function apply(source, pack) {
   }
   changes.push({ id: 'inject-pack', label: `injected "${pack.name}" token layer`, count: 1 });
 
-  return { html, changes };
+  return { html: unstash(html), changes };
 }
