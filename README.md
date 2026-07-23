@@ -182,8 +182,9 @@ No install required:
 
 ```bash
 npx re-template score ./site
-npx re-template apply --pack terminal ./site        # writes ./site/*.terminal.html
-npx re-template apply --pack terminal index.html -w # edits in place
+npx re-template apply    --pack terminal ./site     # reskin: same skeleton, new paint
+npx re-template apply    --pack terminal index.html -w
+npx re-template reformat --pack poke500 index.html  # reformat: rebuild the skeleton
 npx re-template diff  --pack material index.html
 npx re-template packs
 ```
@@ -207,16 +208,40 @@ node tools/build-demo.js     # renders the real before/after into the stage
 node tools/record.js         # → media/demo.gif, media/demo.webm, media/still_*.png
 ```
 
+## Reskin vs. reformat
+
+There are two levels of "make it look like the author made it":
+
+- **`apply` — reskin.** Keeps the page's structure and rewrites the *system-level*
+  choices (color, type, gradients, radius, elevation) plus the author's house
+  style (buttons, cards, kicker labels, nav). Same skeleton, the author's paint.
+- **`reformat` — rebuild the skeleton.** Reads the page into a semantic content
+  model (brand, headline, subhead, action, capabilities, footer) and re-emits it
+  in the author's *layout grammar*: a slim top bar, a hero framed as a restrained
+  quote, feature cards re-cast as a hairline **capabilities table**, a subscribe
+  row, a footer. The output structure *is* the author's, so it can't drift off
+  style, and it's deterministic — the same page always yields the same result.
+
+`reformat` restructures **real content only** — it never fabricates metrics,
+charts, or status badges, because injecting invented data into a real page would
+misrepresent it. If the source has no capabilities to tabulate, the table is
+simply omitted; a thin page still yields a coherent, valid page.
+
+```bash
+npx re-template reformat --pack poke500 index.html   # → index.reformat.html
+```
+
 ## Limitations
 
 Detection is **static analysis** of the served markup and its inline/`<style>`
 CSS. It does not run a full layout engine, so styles injected at runtime by
 JavaScript, or pulled from external stylesheets the tool wasn't handed, are not
-followed — point it at the CSS you want read. The transformer rewrites
-system-level tokens (color, type, gradients, radius, elevation); it deliberately
-does not restructure layout or rewrite copy, so a page whose slop is purely
-structural will improve less than one whose slop is stylistic. Packs approximate a
-design system's *tokens*, not its component library. And the whole tool operates
+followed — point it at the CSS you want read. `apply` rewrites system-level
+tokens (color, type, gradients, radius, elevation) and house style without moving
+the layout; `reformat` goes further and rebuilds the skeleton, but from the
+static content it can extract — content rendered at runtime by JavaScript is not
+seen. Packs approximate a design system's *tokens* and layout conventions, not
+its full component library. And the whole tool operates
 on *systems, not identities* by design — reskinning to a real brand's exact
 look-and-feel is out of scope, not a missing feature.
 

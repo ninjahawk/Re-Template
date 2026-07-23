@@ -9,3 +9,4 @@ examples/**/*.editorial.html
 examples/**/*.terminal.html
 examples/**/*.poke500.html
 *.log
+examples/**/*.reformat.html
