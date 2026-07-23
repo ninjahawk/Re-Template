@@ -58,6 +58,24 @@ test('de-pills the eyebrow badge: no bubble fill, no leading dot', () => {
   assert.ok(changes.some((c) => c.id === 'eyebrow-pill'), 'records the eyebrow-pill change');
 });
 
+test('maps near-white text (authored for a dark hero) to the readable foreground', () => {
+  const { html } = apply(slopHtml, primer);
+  // the card titles and brand were color:#fff — invisible on a light canvas
+  assert.doesNotMatch(html, /\bcolor\s*:\s*#fff\b/i);
+  // but background-color values are untouched
+  assert.match(html, /background:\s*rgba\(255,255,255,0\.03\)/i);
+});
+
+test('removes emoji used as icons and decorations', () => {
+  const { html, changes } = apply(slopHtml, primer);
+  // the feature-card emoji "icon" tiles are gone entirely
+  assert.doesNotMatch(html, /<div class="icon">[\s\S]*?<\/div>/);
+  // no stray decorative emoji left in the brand or footer text
+  assert.doesNotMatch(html, /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]/u);
+  assert.match(html, /FlowSync/); // the words around them survive
+  assert.ok(changes.some((c) => c.id === 'emoji-icon'), 'records the emoji-icon change');
+});
+
 test('injects exactly one pack token layer', () => {
   const { html } = apply(slopHtml, primer);
   const layers = html.match(/data-re-template=/g) || [];

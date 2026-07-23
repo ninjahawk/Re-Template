@@ -87,6 +87,20 @@ export const RULES = [
     },
   },
   {
+    id: 'emoji-icon',
+    label: 'emoji used as UI icons',
+    points: 4,
+    cap: 12,
+    test: (src) => {
+      // An element whose entire content is emoji (+ whitespace) is an emoji
+      // "icon" — the vibe-coded stand-in for a real icon set, usually dropped in
+      // a little tinted tile.
+      const els = src.match(/<(\w+)[^>]*>[\s\u{FE0F}\u{200D}\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]*<\/\1>/gu) || [];
+      const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}]/u;
+      return els.filter((e) => emoji.test(e));
+    },
+  },
+  {
     id: 'over-rounded',
     label: 'over-rounded corners everywhere',
     points: 3,

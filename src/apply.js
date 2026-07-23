@@ -109,6 +109,19 @@ export function apply(source, pack) {
   html = html.replace(hexRe, () => (n++, 'var(--rt-accent)'));
   record('raw-indigo-hex', 'indigo/violet hex → accent color', n);
 
+  // 3b. Near-white text colors → pack foreground. Vibe-coded pages set light
+  // text (`#fff`, tailwind gray-50/100…) for a dark hero; once the canvas flips
+  // to the pack's light surface, that text goes invisible (white headings, an
+  // unreadable brand). Map it to the readable foreground. The lookbehind keeps
+  // us on the `color` property — never `background-color`/`border-color` — and
+  // buttons re-assert their accent-on-fill label through the injected layer.
+  n = 0;
+  html = html.replace(
+    /(?<![-\w])color\s*:\s*(#fff(?:fff)?|#fefefe|#fcfcfc|#fafafa|#f9fafb|#f8f9fa|#f3f4f6|#f1f5f9|#e5e7eb|#e2e8f0|white|rgba?\(\s*255\s*,\s*255\s*,\s*255\b[^)]*\))/gi,
+    () => (n++, 'color:var(--rt-fg)'),
+  );
+  record('white-text', 'near-white text (for a dark hero) → pack foreground', n);
+
   // 4. Inter / default font declarations → pack sans.
   n = 0;
   html = html.replace(/font-family\s*:\s*[^;}]*inter[^;}]*/gi, () => (n++, 'font-family:var(--rt-sans)'));
@@ -180,6 +193,36 @@ export function apply(source, pack) {
       return `<h${lvl}${attrs}>${cleaned}</h${lvl}>`;
     });
     record('emoji-heading', 'emoji removed from headings', n);
+  }
+
+  // 8b. Emoji used as iconography/decoration → gone. Headings are handled above;
+  // here we take the rest: an element whose entire content is emoji (the icon
+  // "tile" in feature cards), plus stray decorative emoji left in body text
+  // (brand ✨, footer ❤️). A real design language uses an icon set, not emoji.
+  if (rules.demoteEmojiIcons !== false) {
+    n = 0;
+    const RANGES = '\\u{1F000}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u{2190}-\\u{21FF}\\u{2B00}-\\u{2BFF}\\u{FE0F}\\u{200D}';
+    const oneEmoji = new RegExp(`[${RANGES}]`, 'u');
+    const emojiRun = new RegExp(`[${RANGES}]+`, 'gu');
+    // (a) An element that is *only* emoji is a decorative icon — drop it whole,
+    //     so we don't leave an empty tinted tile behind.
+    html = html.replace(new RegExp(`<(\\w+)[^>]*>[\\s${RANGES}]*<\\/\\1>`, 'gu'), (m) => {
+      if (!oneEmoji.test(m)) return m;
+      n++;
+      return '';
+    });
+    // (b) Emoji still sitting in a text run → removed, with whitespace/punctuation
+    //     tidied so we don't leave "with  and" or a dangling space.
+    html = html.replace(/>([^<]*)</g, (m, text) => {
+      if (!oneEmoji.test(text)) return m;
+      n++;
+      const cleaned = text
+        .replace(emojiRun, '')
+        .replace(/[ \t]{2,}/g, ' ')
+        .replace(/\s+([.,;:!?])/g, '$1');
+      return `>${cleaned}<`;
+    });
+    record('emoji-icon', 'emoji icons/decorations removed', n);
   }
 
   // 9. Inject the pack stylesheet so unstyled elements still inherit the system.
